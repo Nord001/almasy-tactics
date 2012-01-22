@@ -1,0 +1,29 @@
+﻿SELECT
+    *,
+    (`totalHrs` - 4) / 9 +
+    LEAST(GREATEST((330 - `meanActivity`) / 90, 0), 1/3) +
+    LEAST(GREATEST((100 - `stddevActivity`) / 200, 0), 1/3) +
+    (`quickPings` - 10) / 9
+    AS `botScore`
+FROM
+    (
+    SELECT
+        `users`.`id`,
+        `username`,
+        `date_created`,
+        `last_action`,
+        SUM(`duration`) / 3600 as `totalHrs`,
+        AVG(`duration`) AS `meanActivity`,
+        STDDEV(`duration`) as `stddevActivity`,
+        SUM(IF(`duration` < 310, 1, 0)) as `quickPings`
+    FROM
+        `user_activity`
+    INNER JOIN
+        `users` on `users`.`id` = `user_activity`.`user_id`
+    WHERE
+        `time` > NOW() - INTERVAL 1 DAY
+    GROUP BY
+        `user_id`
+    ) AS `temp`
+ORDER BY
+    `botScore` DESC

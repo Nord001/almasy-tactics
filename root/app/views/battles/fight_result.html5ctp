@@ -1,0 +1,243 @@
+<?
+    define('CELL_HEIGHT', 140);
+    define('CELL_WIDTH_SPACING', 135); // Distance from left edge of one cell to next
+    define('CELL_HEIGHT_SPACING', 150);
+?>
+
+<style type = 'text/css'>
+
+#AttackingFormation {
+    position: absolute;
+    width: 400px;
+    top: 15px;
+    left: 10px;
+}
+
+#DefendingFormation {
+    position: absolute;
+    top: 15px;
+    right: 10px;
+    width: 400px;
+}
+
+.FormationTable {
+    width: 100%;
+}
+
+.CharacterCell {
+    font-weight: bold;
+}
+
+.FormationCell, .HpBar {
+    position: absolute;
+    width: 120px;
+    height: <?= CELL_HEIGHT; ?>px;
+}
+
+.FormationCell {
+    border: 1px solid rgb(0, 0, 0);
+    text-align: center;
+    font-size: 80%;
+}
+
+.HpBar {
+    width: 121px;
+    height: <?= CELL_HEIGHT + 1; ?>px;
+    border-top: 1px solid;
+}
+
+#MessageArea {
+    margin-left: 10px;
+    margin-top: 20px;
+    background-color: rgb(0, 0, 0);
+    color: rgb(255, 255, 255);
+    width: 700px;
+    height: 130px;
+    font-family: 'tahoma';
+    padding: 3px;
+    padding-left: 10px;
+    border: 1px dotted rgb(255, 255, 255);
+    overflow: auto;
+}
+
+#MessageTitle {
+    font-size: 150%;
+}
+
+#Messages {
+}
+
+#ButtonArea {
+    position: absolute;
+    top: 15px;
+    left: 435px;
+}
+
+</style>
+
+<div class = 'PageDiv'>
+
+    <div class = 'PageTitle'>
+        <?= $html->link('Battle', array('controller' => 'battles', 'action' => 'index')); ?> |
+        Battle Result
+    </div>
+
+    <div class = 'PageContent'>
+        <canvas id = 'canvas' width = 850 height = 600 style = 'position: relative; left: 50%; top: 25px; margin-left: -425px;'>
+            You need something besides IE8 to show cool stuff. Or you can get Google Chrome Frame.
+        </canvas>
+
+        <div id = 'ButtonArea'>
+            <input type = 'button' value = '<<' id = 'PrevButton' />
+            <input type = 'button' value = '>>' id = 'NextButton' />
+        </div>
+
+        <div id = 'MessageArea' class = 'rounded-corners'>
+            <div id = 'MessageTitle'>
+            </div>
+
+            <div id = 'Messages'>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?
+    // Preload class images
+    $characters = array_merge($battleInfo['attacker'], $battleInfo['defender']);
+    $icons = Set::classicExtract($characters, '{n}.icon');
+    $icons = array_unique($icons);
+
+    $icons[] = 'face';
+
+    foreach ($icons as $icon)
+        echo $html->image('/img/sprites/' . $icon . '.png', array('id' => $icon, 'style' => 'display: none'));
+?>
+
+<?= $html->image('/img/battle/fireball2.png', array('id' => 'fireball', 'style' => 'display: none')); ?>
+
+<? $javascript->link('battle/battle'); ?>
+
+<script type = 'text/javascript'>
+    <?= file_get_contents('http://127.0.0.1/js/battle/battle.js'); ?>
+    var messages = [<?= implode(',', $messages); ?>];
+    var battleInfo = <?= $battleLog; ?>;
+
+    var c_formationWidth = <?= FORMATION_WIDTH; ?>;
+    var c_formationHeight = <?= FORMATION_HEIGHT; ?>;
+
+    var curMessage = 0;
+
+    var characters = [];
+
+    var fireballs = [];
+
+    var attackerView = new Formation();
+    var defenderView = new Formation();
+
+    var secondsPerFrame = 60;
+
+    function GetCharacterFromFormations (id) {
+        var character = attackerView.GetCharacterById(id);
+        if (character == null)
+            character = defenderView.GetCharacterById(id);
+        return character;
+    }
+
+    function Update () {
+        var message = messages[curMessage];
+
+        $('#MessageTitle').html(message.title);
+
+        $('#Messages').html('');
+        var subMessages = message.messages;
+        for (subMessageIndex in subMessages)
+            $('#Messages').append(subMessages[subMessageIndex] + '<br />');
+
+        if (message['attackingCharId'] != null) {
+            var attackingCharId = message['attackingCharId'];
+            var targetCharId = message['targetCharId']
+
+            var attackingChar = GetCharacterFromFormations(attackingCharId);
+            var targetChar = GetCharacterFromFormations(targetCharId);
+
+            if (attackingChar != null)
+                attackingChar.Attack(targetChar);
+        }
+
+        var hps = message.hps;
+        for (characterId in hps) {
+            var character = GetCharacterFromFormations(characterId);
+
+            if (character == null)
+                continue;
+
+            var hpStr = hps[characterId];
+            var hpSplit = hpStr.split('/');
+            if (hpSplit.length == 2) {
+                var hp = hpSplit[0];
+                var maxHp = hpSplit[1];
+                character.hp = hp;
+                character.maxHp = maxHp;
+            }
+        }
+    }
+
+    var isBenchmarking = true;
+    function Render () {
+        setTimeout(Render, secondsPerFrame);
+
+        if (isBenchmarking)
+            console.time('render');
+        ctx.clearRect(0, 0, 850, 600);
+
+        attackerView.Display();
+        defenderView.Display();
+
+        for (var index in fireballs) {
+            fireballs[index].Update(secondsPerFrame * 0.001);
+            fireballs[index].Display();
+        }
+
+        if (isBenchmarking)
+            console.timeEnd('render');
+    }
+
+    $(document).ready(function() {
+        ctx = document.getElementById('canvas').getContext('2d');
+
+        attackerView.flipped = true;
+        attackerView.LoadCharacters(battleInfo.attacker);
+        attackerView.SetPosition(0, 0);
+        defenderView.LoadCharacters(battleInfo.defender);
+        defenderView.SetPosition(450, 0);
+
+        /*
+        for (var i = 0; i < 10; i++) {
+            var fireball = new Fireball();
+            fireball.SetPosition(Math.random() * 50, Math.random() * 50);
+            fireball.SetVelocity(Math.random() * 250, Math.random() * 250);
+            fireballs.push(fireball);
+        }
+        */
+
+        Render();
+
+        $('#PrevButton').click(function() {
+            curMessage--;
+            if (curMessage < 0)
+                curMessage = 0;
+            Update();
+        });
+
+        $('#NextButton').click(function() {
+            curMessage++;
+            if (curMessage >= messages.length)
+                curMessage = messages.length - 1;
+
+            Update();
+        });
+
+        Update();
+    });
+</script>

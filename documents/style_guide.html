@@ -1,0 +1,351 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta
+        <meta http-equiv="Content-Style-Type" content="text/css"></meta
+        <meta name="generator" content="Aspose.Words for Java 4.0.2.0"
+        <title>Almasy Code Style Guide</title>
+
+        <style type = 'text/css'>
+            .LanguageHeader {
+                font-size: 14pt;
+                font-weight: bold;
+                margin-bottom: 20px;
+            }
+
+            .TypeHeader {
+                font-style: italic;
+                font-size: 14pt;
+                margin-bottom: 10px;
+            }
+
+            pre {
+                border: 1px dashed;
+                padding: 15px;
+                background-color: rgb(245, 240, 240);
+            }
+        </style>
+    </head>
+    <body style = 'font-family: Trebuchet MS;'>
+        <div style = 'text-align: center; font-weight:bold; font-size: 16pt;'>Almasy Code Style Guide</div>
+        <div style = 'position: relative; width: 1000px; left: 50%; margin-left: -500px;'>
+            <div class = 'LanguageHeader'>
+                PHP/Javascript/HTML/CSS:
+            </div>
+
+            <div class = 'TypeHeader'>
+                Model/Controller:
+            </div>
+
+            <div>
+                <ul>
+                    <li><b>Never use tabs to indent.</b> Set your editor to use spaces, and four spaces.</li>
+                    <li>
+                        The model should contain all data manipulation. The only thing that should be in the controller is error checking. If a controller method is using Cache::write or read,
+                        or is using $this->find, or makes SQL queries in any way, it should be moved to a model. If a model is doing authentication checking, it should be in the controller.
+                        If a controller is generating HTML, it should be in the view.
+                    </li>
+                    <li>Space all operators. Put spaces in between =’s, between ifs/for/whiles and their corresponding left parens.</li>
+                    <li>Put a space in between function names and their left parens.</li>
+                    <li>Put a space between the ) and the { for functions, for loops, if statements, etc.
+                    <li>Put the delimiting comment consisting of // followed by 92 -’s above every function. In practice, just copy and paste it from somewhere else.</li>
+                    <li>All variables should be in camelCase. That means no underscores.</li>
+                    <li>All function names are in CamelCase. The first letter should be capitalized.</li>
+                    <li>
+                        Example:
+<pre>
+//--------------------------------------------------------------------------------------------
+function GetUserByUsername ($username) {
+    $user = $this->findByUsername($username);
+    if ($user === false)
+        return false;
+
+    return $this->GetUser($user['User']['id']);
+}
+
+//--------------------------------------------------------------------------------------------
+function GetUser ($userId) {
+    if (!CheckNumeric($userId))
+        return false;
+
+    $a = 5;
+    $b = $a + 5;
+    $c = $a * 5;
+    for ($i = 0; $i < 5; $i++) {
+        ...
+    }
+    ...
+}
+</pre>
+                    </li>
+                    <li>
+                        Arrays look like this. Notice the indent and newline after every array(. And notice that the end parenthesis is on the same level as the line that has the array(.
+<pre>
+var $hasMany = array(
+    'UserItem',
+    'News',
+    'Character',
+    'AiScript',
+    'Message' => array(
+        'foreignKey' => 'receiver_id',
+    )
+);
+</pre>
+                    </li>
+                    <li>
+                        Constants are declared using define() at the top of the file that they are being used in, or in game_constants.php if it relates to the gameplay of the game.
+                        Constants look like this: A_CONSTANT_NAME, EXP_MUTLIPLIER, CAPS_WITH_UNDERSCORES.
+                    </li>
+                    <li>
+                        Always use === whenever testing something that could be cast as something else. This is important when you want to really make sure that a variable is false. For example,
+<pre>
+$a = 0;
+$a == false;  // True
+$a === false; // False
+
+$a = '';
+$a == false;  // True
+$a === false; // False
+
+$a = false;
+$a == false;  // True
+$a === false; // True
+</pre>
+                    </li>
+                    <li>
+                        When writing an action that will be used only to run Ajax logic, remember to use <pre>Configure::write('ajaxMode', 1);</pre> to turn on ajax mode. This will disable SQL debug
+                        while keeping debug on.
+                    </li>
+                    <li>
+                        Models tend to represent a single kind of object. For example, the User model represents a User. Models tend to have methods that look like the following:
+<pre>
+//--------------------------------------------------------------------------------------------
+function GetUser ($userId) {
+    // Ensure arguments are valid
+    if (!CheckNumeric($userId))
+        return false;
+
+    // Look up the user in the cache
+    $cacheKey = GenerateCacheKey(USER_CACHE, $userId);
+    $user = Cache::read($cacheKey, USER_CACHE_DURATION);
+
+    // If the user does not exist in the cache (note the ===)
+    if ($user === false) {
+        // Look up the user with SQL.
+        $user = $this->findById($userId);
+
+        // Other stuff
+        .....
+
+        // Put it in the cache.
+        Cache::write($cacheKey, $user, USER_CACHE_DURATION);
+    }
+
+    // Return the user, whether it was fetched from the cache or from SQL.
+    return $user;
+}
+
+//---------------------------------------------------------------------------------------------
+function GetUsers ($userIds) {
+    // Just loop through the list and fetch one by one.
+    $data = array();
+    foreach ($userIds as $userId)
+        $data[] = $this->GetUser($userId);
+
+    return $data;
+}
+
+//--------------------------------------------------------------------------------------------
+function ClearUserCache ($userId) {
+    // Ensure arguments are valid
+    if (!CheckNumeric($userId))
+        return false;
+
+    // Delete the user from the cache.
+    $cacheKey = GenerateCacheKey(USER_CACHE, $userId);
+    Cache::delete($cacheKey, USER_CACHE_DURATION);
+}
+
+//--------------------------------------------------------------------------------------------
+function GiveMoney ($userId, $amount) {
+
+    // Ensure arguments are valid
+    if (!CheckNumeric($userId))
+        return false;
+    if (!CheckNumeric($amount))
+        return false;
+
+    // Give money to the user via SQL query
+    ....
+
+    // Clear the cache so it updates!
+    $this->ClearUserCache($userId);
+}
+</pre>
+                    Models tend to have a Get, a multiple Get, a Clear, and miscellaneous methods that manipulate that object. Notice of the use of the cache in GetUser. We never query SQL over and over
+                    because that's slow and inefficient. Instead, we cache it and return what's cached whenever someone asks. This is very important for performance. Also notice that the manipulation methods
+                    like GetMoney only take a user id. This is because the method can easily call GetUser if it needs more data. The user id is all it needs to identify the user.
+
+                <li>
+                    Models should always use the method CheckNumeric to ensure that numeric arguments are indeed valid, like in the example above. They should return false if an argument is not numeric.
+                </li>
+                <li>
+                    Models and Controllers should always handle edge cases and exceptions. Never trust what the user sends to use via GET or POST: always assume it might be wrong. Assume ids might not exist,
+                    the id they give you might correspond to a character that doesn't belong to them, or any other problem. If you don't do proper error checking, you may make it possible for someone to
+                    change what does not belong to them, like delete other people's characters because you didn't check to see if the character they wanted to delete actually belonged to them. Good code looks like this (from the perform_refine method to handle refining items):
+<pre>
+if (!isset($this->params['form']['userItemId'])) {
+    echo 'Error';
+    return;
+}
+
+$userItemId = $this->params['form']['userItemId'];
+
+$userItem = $this->UserItem->GetUserItem($userItemId);
+
+// Make sure item exists
+if ($userItem === false) {
+    $this->autoRender = false;
+    TriggerError('User item to be refined doesn\'t exist.');
+    return AJAX_ERROR_CODE;
+}
+
+// Make sure item belongs to logged in user
+$userId = $this->GameAuth->GetLoggedInUserId();
+if ($userItem['UserItem']['user_id'] != $userId) {
+    $this->autoRender = false;
+    TriggerError('User item to be refined doesn\'t belong to authed user.');
+    return AJAX_ERROR_CODE;
+}
+
+// Make sure item refine is sane
+$refineLevel = $userItem['UserItem']['refine'];
+if ($refineLevel < 0 || $refineLevel >= 10) {
+    $this->autoRender = false;
+    TriggerError('User item to be refined cannot be refined anymore.');
+    return AJAX_ERROR_CODE;
+}
+
+$cost = $this->RefineTable->GetRefineCost($userItemId);
+if (!$this->User->DeductMoney($userId, $cost)) {
+    $this->autoRender = false;
+    return AJAX_INSUFFICIENT_FUNDS;
+}
+
+// Do refine here
+...
+</pre>
+                    Notice the chained if statements - we first check to see if the data exists that we expected ($this->params['form']['userItemId']) with isset. Then we check to make sure it corresponds
+                    to a valid user item.  Then we check if that user item really belongs to the logged in user. Then we make sure they aren't trying to refine an item that is already 10.
+                    Then we check if they have enough money to pay for it. Only after all this code executes do we actually let the refine go forwards.
+                </li>
+            </div>
+
+            <div class = 'TypeHeader'>
+                View (PHP/HTML):
+            </div>
+
+            <div>
+                 <ul>
+                    <li>
+                        View style is a different story. The view handles the construction of presentation, ie. HTML. If you're doing complex calculations in the view, it should probably be in the controller.
+                    </li>
+                    <li>
+                        Make frequent use of &lt;? and ?&gt; to go into PHP mode. Even for one line tidbits. You should almost never use echo to output HTML. Echo is ugly and hard to read. Instead use
+                        &lt;?= $stuff_to_output; ?&gt; to quickly insert bits of data that you want.
+                    </li>
+                    <li>
+                        When doing for loops, foreach loops, if statements, etc, use colon syntax. PHP has alternate syntax without using { and }. You can say if (blah): <statements> endif; and it will work fine.
+                        This is <b>much</b> better than using braces because they clearly say what kind of construct they are ending. Example:
+<pre>
+&lt;table&gt;
+    &lt;? foreach ($scripts as $script): ?&gt;
+        &lt;tr&gt;
+            &lt;td&gt;
+                &lt;?= $html-&gt;link('Edit', array('controller' =&gt; 'formations', 'action' =&gt; 'edit_script', $formation['Formation']['id'], $script['AiScript']['id'])); ?&gt;
+            &lt;/td&gt;
+            &lt;td&gt;
+                &lt;a class = 'Link_DeleteScript' href = '#' scriptId = '&lt;?= $script['AiScript']['id']; ?&gt;'&gt;Delete&lt;/a&gt;
+            &lt;/td&gt;
+            &lt;td&gt;&lt;?= $script['AiScript']['name']; ?&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;? endforeach; ?&gt;
+&lt;/table&gt;
+</pre>
+                        Notice the construction of a simple table by using foreach and endforeach. PHP knows to duplicate the HTML between the foreach and endforeach, just like a regular loop.
+                        Notice that none of the HTML is inside PHP - <b>no echo at all</b>. This makes the code look a lot cleaner when the HTML is sitting alone. Cool, right? We only use &lt;?= ?&gt;
+                        to output the stuff that needs to come from the script data. The &lt;tr&gt;s, &lt;td&gt;s, are all by themselves.
+                    </li>
+                    <li>
+                        Also notice the indentation. Each PHP construct (foreach, if, etc) indents by one level, and every HTML construct (&lt;tr&gt;, etc) indents by one level too. You can write it all on one line
+                        like the last &lt;td&gt; above, but only if it's short. The first two &lt;td&gt;s have lots of code, so they're indented as well.
+                    </li>
+                </ul>
+            </div>
+
+            <div class = 'TypeHeader'>
+                Javascript:
+            </div>
+
+            <div>
+                <ul>
+                    <li>
+                        Javascript is formatted a lot like PHP. However, indentation is very specific. Also, make sure that all javascript is preferably at the bottom of the page, or if it's too long, in a separate .js file. Example:
+<pre>
+&lt;script type = 'text/javascript'&gt;
+    $(document).ready(function() {
+
+        // Setup hover
+        $('.CharacterBox').hover(
+            function() {
+                $(this).attr('oldBg', $(this).css('background-color'));
+                $(this).css('background-color', 'rgb(230, 210, 210)');
+                $('body').css('cursor', 'pointer');
+            },
+            function() {
+                $(this).css('background-color', $(this).attr('oldBg'));
+                $('body').css('cursor', 'auto');
+            }
+        );
+
+        $('.CharacterBox').click(function() {
+            window.location = $(this).find('a').attr('href');
+        });
+    });
+&lt;/script&gt;
+</pre>
+                        Notice the line <i>$(document).ready(function() {</i>. The closure function is written directly after the (, because that is the only argument that ready() takes.
+                        The hover however, takes two functions, so the functions are written on their own indented line. Also notice the spaces between the () and the {.
+                    </li>
+            </div>
+
+            <div class = 'TypeHeader'>
+                CSS:
+            </div>
+
+            <div>
+                <ul>
+                    <li>
+                        Class names are followed by a space, then {. Attributes go on the next line, and are indented. Example:
+<pre>
+html {
+    font-family: trebuchet ms, tahoma, helvetica, sans-serif;
+    background: url('/img/bg.gif');
+    padding: 0px;
+    margin: 0px;
+}
+
+.HelpIntro {
+    padding: 5px;
+    width: 750px;
+    margin-bottom: 10px;
+    text-align: justify;
+}
+</pre>
+                    </li>
+                    <li>I haven't fully decided on how to name classes, but they should also be CamelCase.</li>
+                </ul>
+            </div>
+
+            I'm sure there's stuff I haven't covered. If you're confused, just ask me, or consult a part of the code that does what you're trying to do.
+    </body>
+</html>

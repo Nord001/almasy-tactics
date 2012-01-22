@@ -1,0 +1,72 @@
+Frequencies by Query
+
+fight                                    2
+UnequipItem                             25
+GetFormation                            62
+GetCharacter                           172
+GetImbueModsByImbueId                    3
+GetPromotionClasses                      5
+GetNumOnlineUsers                       23
+GetLastBattles                           2
+GetFormationIdsByUserId                  3
+read                                    37
+GetMessageIdsByReceiverId                1
+field                                  839
+GetUserItem                            141
+query                                  494
+GetNumUnreadMessagesByReceiverId         5
+GetUserItemIdsByUser                     1
+deleteAll                                5
+GetItem                                  2
+GetCharacterIdsByUserId                  8
+exists                                 586
+
+
+Time by Query
+
+fight                                    2ms
+UnequipItem                             59ms
+GetFormation                           516ms
+GetCharacter                          2423ms
+GetImbueModsByImbueId                   13ms
+GetPromotionClasses                     51ms
+GetNumOnlineUsers                       88ms
+GetLastBattles                         189ms
+GetFormationIdsByUserId                 26ms
+read                                    66ms
+GetMessageIdsByReceiverId                1ms
+field                                  568ms
+GetUserItem                           2513ms
+query                                  980ms
+GetNumUnreadMessagesByReceiverId        70ms
+GetUserItemIdsByUser                     1ms
+deleteAll                                4ms
+GetItem                                 34ms
+GetCharacterIdsByUserId                 35ms
+exists                                 340ms
+
+
+% Time by Query
+
+fight                                  0.0%
+UnequipItem                            0.7%
+GetFormation                           6.5%
+GetCharacter                          30.3%
+GetImbueModsByImbueId                  0.2%
+GetPromotionClasses                    0.6%
+GetNumOnlineUsers                      1.1%
+GetLastBattles                         2.4%
+GetFormationIdsByUserId                0.3%
+read                                   0.8%
+GetMessageIdsByReceiverId              0.0%
+field                                  7.1%
+GetUserItem                           31.5%
+query                                 12.3%
+GetNumUnreadMessagesByReceiverId       0.9%
+GetUserItemIdsByUser                   0.0%
+deleteAll                              0.1%
+GetItem                                0.4%
+GetCharacterIdsByUserId                0.4%
+exists                                 4.3%
+
+Tool completed successfully

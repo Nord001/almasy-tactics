@@ -1,0 +1,84 @@
+battles_controller
+index: 1
+history: 1
+fight: 2
+matchmake: 23
+fight_result: 1
+
+army_controller
+index: 1
+
+help_controller
+index: 1
+class_list: 1
+view_class: 1
+
+formations_controller
+index: 1
+rankings: 1
+view: 1
+create: 2
+edit: 2
+move_character: 23
+delete: 2
+set_active: 2
+strategy: 1
+create_script: 2
+edit_script: 2
+delete_script: 2
+edit_ai: 2
+
+faqs_controller
+index: 1
+
+status_controller
+index: 1
+
+characters_controller
+view: 1
+new_character: 1
+roll_new_character: 23
+levelup: 2
+change_class: 2
+delete: 2
+
+items_controller
+index: 1
+unequip_item: 23
+equip_item: 23
+perform_refine: 23
+perform_imbue: 23
+store: 1
+view_items: 3
+buy_item: 23
+sell_item: 23
+
+messages_controller
+index: 1
+send: 2
+mark_read: 23
+clean: 2
+mark_all_read: 2
+delete: 2
+
+users_controller
+login: 2
+logout: 2
+change_password: 2
+get_money: 3
+register: 2
+usernameAvailable: 3
+profile: 1
+referrals: 1
+change_portrait: 2
+reset: 2
+forgot: 2
+reset_password: 2
+stats: 1
+increase_stat: 2
+preferences: 2
+
+home_controller
+index: 1
+feedback: 23
+

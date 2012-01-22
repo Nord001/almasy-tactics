@@ -1,0 +1,127 @@
+html {
+    font-family: trebuchet ms, helvetica,sans-serif;
+}
+
+pre {
+    margin-left: 225px;
+}
+
+a { color: rgb(0, 0, 0); }
+
+h2, h3 {
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+#dashboard {
+    height: 100%;
+    width: 185px;
+    border-right: 1px solid;
+    position: fixed;
+    background-color: rgb(225, 225, 225);
+    padding-left: 10px;
+    left: 0px;
+    top: 0px;
+    font-size: 90%;
+    line-height: 1.5;
+    overflow: auto;
+}
+#dashboard ul { margin-top: 3px; margin-bottom: 3px; margin-left: -15px; }
+#dashboard ul ul { margin-left: -20px; }
+#dashboard ul li { margin-top: -2px; }
+
+#main-container {
+    margin-left: 210px;
+}
+
+.DividerHeader {
+    margin-top: 30px;
+    font-size: 150%;
+    width: 700px;
+    border-bottom: 1px dotted;
+}
+
+.cake-sql-log { margin-left: 200px; }
+.message {
+    clear: both;
+    color: #900;
+    font-size: 140%;
+    font-weight: bold;
+    margin: 1em 0;
+}
+.pagination {
+    margin-bottom: 5px;
+    text-align: center;
+}
+.pagination div { display: inline; }
+
+#footer {
+    margin-left: 200px;
+    border-top: 1px solid rgb(153, 153, 153);
+    clear: both;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 8pt;
+    margin-top: 10px;
+}
+
+/** Tables **/
+table {
+    border-collapse: collapse;
+}
+
+table.data { width: 100%; font-size: 70%; }
+table.data tr.altrow { background-color: rgb(240, 240, 240); }
+
+table.view-table td.column-1 { width: 200px; }
+table.view-table td.column-2 { width: 500px; }
+table.view-table tr td { padding-bottom: 5px; }
+table.view-table th { font-size: 120%; }
+
+table tr.header { border-bottom: 1px solid; }
+th { text-align: left; }
+th.actions { text-align: center; }
+td.actions { text-align: center; }
+
+/** Forms **/
+form {
+    clear: both;
+    margin-right: 20px;
+    padding: 0;
+    width: 75%;
+}
+fieldset { border-radius: 5px; -moz-border-radius: 5px; border: 1px solid; padding-left: 20px; background-color: rgb(230, 230, 230); }
+fieldset legend { font-size: 140%; font-weight: bold; }
+fieldset fieldset { margin-bottom: 20px; margin-top: 0px; padding: 16px 0; padding-left: 20px; background-color: rgb(205, 205, 205); }
+fieldset fieldset legend { font-size: 120%; font-weight: normal; }
+
+
+label {
+    margin-top: 5px;
+    margin-bottom: 2px;
+    display: block;
+    padding-right: 20px;
+}
+input, textarea {
+    font-family: "frutiger linotype", "lucida grande", "verdana", sans-serif;
+    font-size: 100%;
+    padding: 2px;
+    width: 275px;
+}
+textarea { width: 400px; }
+
+select { width: 200px; }
+input[type=submit] { margin-top: 5px; }
+/*input[type=checkbox].inline { width: auto; }*/
+input[type=checkbox] {
+    clear: left;
+    float: left;
+    margin: 10px 6px 7px 3px;
+    width: auto;
+}
+input[type=button] { width: auto; font-size: 70%; }
+
+div.error-message {
+    clear: both;
+    color: #900;
+    font-weight: bold;
+}

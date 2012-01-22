@@ -1,0 +1,12 @@
+﻿SELECT
+  COUNT(*) AS freq,
+  (
+    SELECT
+      COUNT(DISTINCT DATE_FORMAT(`time`, '%Y-%m-%d'))
+    FROM
+      user_activity AS ua
+    WHERE ua.user_id = users.id
+  ) AS `numDaysPlayed`
+FROM
+  `users`
+GROUP BY `numDaysPlayed`

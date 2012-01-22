@@ -1,0 +1,1 @@
+﻿select username, sum(duration) / 3600 as time1, sum(duration) / 3600  / DATEDIFF(NOW(), date_created) as hrsperday, DATEDIFF(NOW(), date_created) as days from user_activity inner join users on users.id = user_activity.user_id group by username order by hrsperday desc

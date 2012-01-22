@@ -1,0 +1,9 @@
+﻿SELECT
+  SUM(duration) / 60 / 60 AS `hours`,
+  STR_TO_DATE(CONCAT(YEARWEEK(DATE_SUB(`time`, INTERVAL 2 HOUR)), 'Sunday'), '%X%V%W') AS `week`
+	FROM
+		`user_activity`
+	GROUP BY
+    YEARWEEK(DATE_SUB(`time`, INTERVAL 2 HOUR))
+	ORDER BY
+		`week` DESC;

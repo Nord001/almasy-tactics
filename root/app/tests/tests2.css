@@ -1,0 +1,5 @@
+.fail { background-color: inherit; color: red; font-weight: bold; }
+.pass { background-color: inherit; color: green; font-weight: bold; }
+ pre { background-color: lightgray; color: inherit; }
+html { font-family: calibri, courier new, palatino linotype, trebuchet ms, serif; }
+ .Header { font-weight: bold; font-size: 130%; }

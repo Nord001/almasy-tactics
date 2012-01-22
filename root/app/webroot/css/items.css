@@ -1,0 +1,132 @@
+.ArmoryHeader {
+    background-color: #325165;
+    background-repeat: repeat-x;
+    color: rgb(255,255,255);
+    font-size: 100%;
+    margin: 0px;
+    padding: 2px 5px 2px 7px;
+    text-indent: 0cm;
+    font-weight: bold;
+    height: 22px;
+}
+
+#ItemsPage {
+    position: relative;
+}
+
+#SellPane {
+    border: 1px solid;
+    height: 60px;
+}
+
+#IRPane {
+    border: 1px solid;
+    height: 160px;
+    background-color: rgb(245, 230, 220);
+}
+
+#IRContent {
+    position: relative;
+    font-size: 80%;
+    display: none;
+}
+
+#IRItemName {
+    font-size: 110%;
+}
+
+#IRInstructions {
+    padding: 3px;
+    position: relative;
+    top: 8px;
+    text-align: center;
+    font-style: italic;
+    font-size: 80%;
+}
+
+.CharacterEquipPane {
+    border: 1px dotted;
+    margin-bottom: 5px;
+    height: 30px;
+    background-color: rgb(245, 245, 245);
+    font-size: 80%;
+}
+
+.CharacterEquipPaneContent {
+     height: 60px;
+}
+
+#ArmoryPane {
+    background-color: rgb(230, 245, 220);
+    border: 1px solid;
+}
+
+#ArmoryContent {
+    padding: 3px;
+    padding-top: 4px;
+}
+
+.ImbueShade {
+    opacity: .3;
+    filter: alpha(opacity = 30);
+    position: absolute;
+    width: 25px;
+    height: 25px;
+}
+
+.ImbueSelect {
+    width: 150px;
+}
+
+#PerformImbueButton, #PerformRefineButton {
+    margin-top: 5px;
+}
+
+.Selected {
+    <? GradientBackground(array(
+        array(0, 'rgb(50, 50, 50)'),
+        array(1, 'rgb(0, 0, 0)')
+    )); ?>
+    background-color: rgb(0, 0, 0);
+    color: rgb(255, 255, 255);
+    border-radius: 5px;
+}
+
+.Disabled {
+    color: rgb(100, 100, 100);
+}
+
+.ItemTooltipData {
+    position: absolute;
+    display: none;
+    border: 1px solid #333;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    padding: 4px 8px 4px 8px;
+    color: #fff;
+    background-color: #000;
+    opacity: 0.90;
+}
+
+
+.ItemTooltipData table tr td { text-align: center; }
+.ItemTooltipData div { text-align: center; }
+
+.ItemTooltip span:hover { text-decoration: underline; }
+
+.item-mod {
+    color: rgb(95, 95, 245);
+}
+
+.CharacterTooltip {
+    font-weight: bold;
+    position: absolute;
+    display: none;
+    border: 1px solid #333;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    padding: 4px 8px 4px 8px;
+    color: #fff;
+    background-color: #000;
+    opacity: 0.90;
+}

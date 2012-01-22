@@ -1,0 +1,9 @@
+﻿SELECT
+	SUM(`duration`) / 3600 AS `hours`,
+  DATE_FORMAT(DATE_SUB(`time`, INTERVAL 2 HOUR), "%Y-%m-%d") AS `day`
+	FROM
+		`user_activity`
+	GROUP BY
+		`day`
+	ORDER BY
+		`day` DESC;

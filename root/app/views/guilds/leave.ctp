@@ -1,0 +1,19 @@
+<div class = 'PageDiv'>
+
+    <div class = 'PageTitle'>
+        <?= $html->link2($guild['Guild']['name'], array('controller' => 'guilds', 'action' => 'view', $guild['Guild']['id'])); ?> | Leave Guild
+    </div>
+
+    <div class = 'PageContent' style = 'padding-left: 10px;'>
+        <? if ($guild['Guild']['leader_id'] == @$a_user['User']['id']): ?>
+            You cannot leave the guild because you are the guild leader.
+        <? else: ?>
+            Are you sure you want to leave the guild? This is final!
+            <?= $form->create('Guild', array('action' => 'leave')); ?>
+                <?= $form->hidden('csrf_token', array('name' => 'data[csrf_token]', 'value' => $a_user['User']['csrf_token'])); ?>
+                <input type = 'submit' value = 'Leave Guild' style = 'width: 200px' />
+                <input type = 'button' value = 'Cancel' style = 'width: 200px; font-size: 12pt; height: 30px;' class = 'LinkButton' href = '<?= $html->url(array('controller' => 'guilds', 'action' => 'view')); ?>' />
+            </form>
+        <? endif; ?>
+    </div>
+</div>

@@ -1,0 +1,30 @@
+﻿SELECT
+    `week`,
+    `numNewAccounts`,
+    `referredAccounts`,
+    `numStuckForTenMinutes`,
+    CONCAT(ROUND(`numStuckForTenMinutes` / `numNewAccounts` * 100, 1), '%') AS `numStuckForTenMinutesCumul`,
+    `numStuckForOneDay`,
+    CONCAT(ROUND(`numStuckForOneDay` / `numStuckForTenMinutes` * 100, 1), '%') AS `numStuckForOneDayCumul`,
+    `numStuckForOneWeek`,
+    CONCAT(ROUND(`numStuckForOneWeek` / `numStuckForOneDay` * 100, 1), '%') AS `numStuckForOneWeekCumul`,
+    `numStuckForOneWeekP` AS `numStuckForOneWeekTotal`
+FROM
+    (
+        SELECT
+            STR_TO_DATE(CONCAT(YEARWEEK(DATE_SUB(`date_created`, INTERVAL 2 HOUR)), 'Sunday'), '%X%V%W') AS `week`,
+            COUNT(DISTINCT `email`) AS `numNewAccounts`,
+            SUM(IF(referring_id, 1, 0)) AS `referredAccounts`,
+            SUM(IF(last_action > date_created, 1, 0)) AS `numStuckForTenMinutes`,
+            CONCAT(ROUND(SUM(IF(last_action > date_created, 1, 0)) / COUNT(DISTINCT `email`) * 100, 1), '%') AS `numStuckForTenMinutesP`,
+            SUM(IF(last_action > date_created + INTERVAL 1 DAY, 1, 0)) AS `numStuckForOneDay`,
+            CONCAT(ROUND(SUM(IF(last_action > date_created + INTERVAL 1 DAY, 1, 0)) / COUNT(DISTINCT `email`) * 100, 1), '%') AS `numStuckForOneDayP`,
+            SUM(IF(last_action > date_created + INTERVAL 1 WEEK, 1, 0)) AS `numStuckForOneWeek`,
+            CONCAT(ROUND(SUM(IF(last_action > date_created + INTERVAL 1 WEEK, 1, 0)) / COUNT(DISTINCT `email`) * 100, 1), '%') AS `numStuckForOneWeekP`
+        FROM
+            `users`
+        GROUP BY
+            YEARWEEK(DATE_SUB(`date_created`, INTERVAL 2 HOUR))
+        ORDER BY
+            `week` DESC
+    ) AS `temp`

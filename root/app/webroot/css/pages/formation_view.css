@@ -1,0 +1,89 @@
+.Header {
+    background-color: #325165;
+    background-repeat: repeat-x;
+    color: rgb(255,255,255);
+    font-size: 100%;
+    margin: 0px;
+    padding: 2px 5px 2px 7px;
+    text-indent: 0cm;
+    font-weight: bold;
+    height: 22px;
+}
+
+#FormationTable {
+}
+
+.FormationRow0 {
+    background-color: rgb(200, 200, 150);
+}
+
+.FormationRow1 {
+    background-color: rgb(200, 200, 175);
+}
+
+.FormationRow2 {
+    background-color: rgb(200, 200, 200);
+}
+
+.LessIcon {
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+#FormationStatsDiv {
+    position: absolute;
+    top: 0px;
+    left: 300px;
+    width: 650px;
+}
+
+.CharacterStatDiv {
+    font-size: 85%;
+    width: 315px;
+    border: 1px solid;
+    margin-top: 1px;
+    height: 100px;
+    padding: 3px;
+    font-family: "lucida sans";
+    position: relative;
+}
+
+.CharacterStatDiv table {
+    margin-top: 6px;
+    width: 100%;
+}
+
+.CharacterStatDiv td {
+}
+
+.CharacterStatHeader {
+    border-bottom: 1px dotted;
+}
+
+.CharacterStatName {
+    font-weight: bold;
+    font-size: 9pt;
+}
+
+.CharacterStats {
+    position: absolute;
+    right: 5px;
+    top: 4px;
+}
+
+.AltCell {
+    background-color: rgb(245, 240, 210);
+}
+
+.BonusTooltip {
+    position: absolute;
+    display: none;
+    border: 1px solid #333;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    padding: 4px 8px 4px 8px;
+    color: #fff;
+    background-color: #000;
+    opacity: 0.95;
+    width: 400px;
+}

@@ -1,0 +1,9 @@
+﻿SELECT
+	COUNT(*) AS `newAccounts`,
+  DATE_FORMAT(DATE_SUB(`date_created`, INTERVAL 2 HOUR), "%Y-%m-%d") AS `day`
+	FROM
+		`users`
+	GROUP BY
+		`day`
+	ORDER BY
+		`day` DESC;

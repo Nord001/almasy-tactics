@@ -1,0 +1,441 @@
+<?
+    define('CELL_HEIGHT', 140);
+    define('CELL_WIDTH_SPACING', 135); // Distance from left edge of one cell to next
+    define('CELL_HEIGHT_SPACING', 150);
+?>
+
+<style type = 'text/css'>
+
+#AttackingFormation {
+    position: absolute;
+    width: 400px;
+    top: 15px;
+    left: 10px;
+}
+
+#DefendingFormation {
+    position: absolute;
+    top: 15px;
+    right: 10px;
+    width: 400px;
+}
+
+.FormationTable {
+    width: 100%;
+}
+
+.CharacterCell {
+    font-weight: bold;
+}
+
+.FormationCell, .HpBar {
+    position: absolute;
+    width: 120px;
+    height: <?= CELL_HEIGHT; ?>px;
+}
+
+.FormationCell {
+    border: 1px solid rgb(0, 0, 0);
+    text-align: center;
+    font-size: 80%;
+}
+
+.HpBar {
+    width: 121px;
+    height: <?= CELL_HEIGHT + 1; ?>px;
+    border-top: 1px solid;
+}
+
+#MessageArea {
+    margin-left: 10px;
+    background-color: rgb(0, 0, 0);
+    color: rgb(255, 255, 255);
+    width: 700px;
+    height: 130px;
+    font-family: 'tahoma';
+    padding: 3px;
+    padding-left: 10px;
+    border: 1px dotted rgb(255, 255, 255);
+    overflow: auto;
+}
+
+#MessageTitle {
+    font-size: 150%;
+}
+
+#Messages {
+}
+
+#ButtonArea {
+    position: absolute;
+    top: 15px;
+    left: 435px;
+}
+
+</style>
+
+<div class = 'PageDiv'>
+
+    <div class = 'PageTitle'>
+        <?= $html->link('Battle', array('controller' => 'battles', 'action' => 'index')); ?> |
+        Battle Result
+    </div>
+
+    <div class = 'PageContent'>
+        <canvas id = 'canvas' width = 850 height = 600 style = 'border: 1px solid'>
+            You need something besides IE8 to show cool stuff. Or you can get Google Chrome Frame.
+        </canvas>
+
+        <div id = 'MessageArea' class = 'rounded-corners'>
+            <div id = 'MessageTitle'>
+            </div>
+
+            <div id = 'Messages'>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?
+    // Preload class images
+    $characters = array_merge($battleInfo['attacker'], $battleInfo['defender']);
+    $icons = Set::classicExtract($characters, '{n}.icon');
+    $icons = array_unique($icons);
+
+    $icons[] = 'face';
+
+    foreach ($icons as $icon)
+        echo $html->image('/img/sprites/' . $icon . '.png', array('id' => $icon, 'style' => 'display: none'));
+?>
+
+<?= $html->image('/img/battle/fireball2.png', array('id' => 'fireball', 'style' => 'display: none')); ?>
+
+<script type = 'text/javascript'>
+    var messages = [<?= implode(',', $messages); ?>];
+
+    var curMessage = 0;
+
+    function Update () {
+        var message = messages[curMessage];
+
+        $('#MessageTitle').html(message.title);
+
+        $('#Messages').html('');
+        var subMessages = message.messages;
+        for (subMessageIndex in subMessages)
+            $('#Messages').append(subMessages[subMessageIndex] + '<br />');
+    }
+
+    var cellHeight = 140;
+    var c_formationWidth = <?= FORMATION_WIDTH; ?>;
+    var c_formationHeight = <?= FORMATION_HEIGHT; ?>;
+    var c_cellWidthSpacing = 135;
+    var c_cellHeightSpacing = 150;
+
+    var battleInfo = <?= $battleLog; ?>;
+
+    var ctx;
+
+    function Fireball () {
+        this.x = 0;
+        this.y = 0;
+        this.vx = 0;
+        this.vy = 0;
+        this.t = 0;
+        this.lastFireball = 0;
+        this.trail = [];
+
+        Fireball.prototype.SetPosition = FireballSetPosition;
+        Fireball.prototype.SetVelocity = FireballSetVelocity;
+        Fireball.prototype.Display = FireballDisplay;
+        Fireball.prototype.Update = FireballUpdate;
+    }
+
+    function FireballSetPosition (x, y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    function FireballSetVelocity (x, y) {
+        this.vx = x;
+        this.vy = y;
+    }
+
+    function FireballUpdate (dt) {
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
+        this.t += dt;
+
+        if (this.t - this.lastFireball > .1) {
+            this.trail.push({x: this.x, y: this.y});
+
+            if (this.trail.length > 3)
+                this.trail.shift();
+
+            this.lastFireball = this.t;
+        }
+    }
+
+    var a = document.getElementById('fireball');
+
+    function FireballDisplay () {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.drawImage(a, 0, 0);
+        ctx.restore();
+
+        for (var i = 0; i < this.trail.length; i++) {
+            ctx.save();
+
+            var alpha = .8 - i * .1;
+            ctx.globalAlpha = alpha;
+
+            var lightness = 70 - i * 10;
+            ctx.fillStyle = 'hsl(0, 80%, ' + lightness + '%)';
+            ctx.shadowBlur = 5.0;
+            ctx.shadowColor = 'hsl(0, 60%, 40%)';
+            ctx.shadowOffsetX = 0;
+            var radius = 25 - i * 1;
+
+            ctx.translate(this.trail[i].x, this.trail[i].y);
+            DrawCircle(radius, true, false);
+
+            ctx.restore();
+
+        }
+        ctx.restore();
+    }
+
+
+    function Formation () {
+        this.characters = [];
+        this.x = 0;
+        this.y = 0;
+        this.flipped = false;
+
+        Formation.prototype.SetPosition = FormationSetPosition;
+        Formation.prototype.LoadCharacters = FormationLoadCharacters;
+        Formation.prototype.Display = FormationDisplay;
+        Formation.prototype.GetCharacterById = FormationGetCharacterById;
+    }
+
+    function FormationSetPosition (x, y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    function FormationLoadCharacters (info) {
+        for (var x = 0; x < c_formationWidth; x++) {
+            for (var y = 0; y < c_formationHeight; y++) {
+                var pos = x + y * c_formationWidth;
+
+                var xCoord;
+                if (this.flipped)
+                    xCoord = (c_formationHeight - y - 1) * c_cellWidthSpacing;
+                else
+                    xCoord = y * c_cellWidthSpacing;
+
+                var yCoord = x * c_cellHeightSpacing;
+
+                var char = info[pos];
+
+                if (char == null)
+                    continue;
+
+                var c = new Character();
+
+                c.SetPosition(xCoord, yCoord);
+                c.name = char.name;
+                c.icon = char.icon;
+                c.maxHp = 15;
+
+                this.characters.push(c);
+            }
+        }
+    }
+
+    function FormationDisplay () {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        for (var index in this.characters) {
+            this.characters[index].Display();
+        }
+        ctx.restore();
+    }
+
+    function FormationGetCharacterById (id) {
+        for (var index in this.characters) {
+            var character = this.characters[index];
+            if (character.id == id)
+                return character;
+        }
+    }
+
+    function Character () {
+        this.x = 0;
+        this.y = 0;
+        this.id = 0;
+        this.hp = 0;
+        this.maxHp = 0;
+        this.icon = '';
+        this.name = '';
+
+        Character.prototype.SetPosition = CharacterSetPosition;
+        Character.prototype.Display = CharacterDisplay;
+    }
+
+    function CharacterSetPosition (x, y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    var c_characterPanelWidth = 125;
+    var c_characterPanelHeight = 140;
+    var c_iconSize = 100;
+    function CharacterDisplay () {
+        var length;
+
+        ctx.save();
+        ctx.translate(this.x, this.y);
+
+        // Hp
+        var percent = this.hp / this.maxHp;
+        if (isNaN(percent))
+            percent = 0;
+
+        var height = c_characterPanelHeight * percent;
+        ctx.save();
+        if (percent > .6) {
+            ctx.fillStyle = 'rgb(140, 240, 140)';
+        } else if (percent > .3) {
+            ctx.fillStyle = 'rgb(240, 240, 130)';
+        } else if (percent > 0) {
+            ctx.fillStyle = 'rgb(240, 140, 140)';
+        }
+        ctx.translate(0, c_characterPanelHeight - height);
+        ctx.fillRect(0, 0, c_characterPanelWidth, height);
+        ctx.strokeRect(0, 0, c_characterPanelWidth, height);
+        ctx.restore();
+
+        // Border
+        ctx.strokeRect(0, 0, c_characterPanelWidth, c_characterPanelHeight);
+
+        // Icon
+        ctx.save();
+        var iconStr = this.icon;
+        if (iconStr == '')
+            iconStr = 'face';
+
+        var icon = document.getElementById(iconStr);
+        ctx.translate(parseInt(c_characterPanelWidth / 2 - c_iconSize / 2), 5);
+        ctx.strokeRect(0, 0, c_iconSize, c_iconSize);
+        ctx.drawImage(icon, 0, 0);
+        ctx.restore();
+
+        ctx.font = 'bold 14px tahoma';
+        length = ctx.measureText(this.name).width;
+        ctx.fillText(this.name, c_characterPanelWidth / 2 - length / 2, 120);
+
+        var hpString = this.hp + ' / ' + this.maxHp;
+        length = ctx.measureText(hpString).width;
+        ctx.fillText(hpString, c_characterPanelWidth / 2 - length / 2, 135);
+
+        ctx.restore();
+    }
+
+    function DrawCircle (radius, filled, stroked) {
+        if (filled == null)
+            filled = false;
+        if (stroked == null)
+            stroked = true;
+
+        ctx.beginPath();
+        ctx.moveTo(0, -radius);
+        ctx.arc(0, 0, radius, 0, Math.PI * 2, true);
+        if (filled)
+            ctx.fill();
+        if (stroked)
+            ctx.stroke();
+    }
+
+    var radius = 10;
+    function DrawRoundedRect (ctx, width, height, filled, stroked) {
+        if (filled == null)
+            filled = false;
+        if (stroked == null)
+            stroked = true;
+
+        ctx.beginPath();
+        ctx.moveTo(radius, 0);
+        ctx.lineTo(width - radius, 0);
+        ctx.quadraticCurveTo(width, 0, width, radius);
+        ctx.lineTo(width, height - radius);
+        ctx.quadraticCurveTo(width, height, width - radius, height);
+        ctx.lineTo(radius, height);
+        ctx.quadraticCurveTo(0, height, 0, height - radius);
+        ctx.lineTo(0, radius);
+        ctx.quadraticCurveTo(0, 0, radius, 0);
+        if (filled)
+            ctx.fill();
+        if (stroked)
+            ctx.stroke();
+    }
+
+    var characters = [];
+
+    var fireballs = [];
+
+    var attackerView = new Formation();
+    var defenderView = new Formation();
+    function Render () {
+        setTimeout(Render, 40);
+
+        console.time('render');
+        ctx.clearRect(0, 0, 850, 600);
+
+        //attackerView.Display();
+        //defenderView.Display();
+
+        for (var index in fireballs) {
+            fireballs[index].Update(40 * 0.001);
+            fireballs[index].Display();
+        }
+        console.timeEnd('render');
+    }
+
+    $(document).ready(function() {
+        ctx = document.getElementById('canvas').getContext('2d');
+
+        attackerView.flipped = true;
+        attackerView.LoadCharacters(battleInfo.attacker);
+        attackerView.SetPosition(0, 0);
+        defenderView.LoadCharacters(battleInfo.defender);
+        defenderView.SetPosition(450, 0);
+
+        for (var i = 0; i < 10; i++) {
+            var fireball = new Fireball();
+            fireball.SetPosition(Math.random() * 50, Math.random() * 50);
+            fireball.SetVelocity(Math.random() * 250, Math.random() * 250);
+            fireballs.push(fireball);
+        }
+
+        Render();
+
+        $('#PrevButton').click(function() {
+            curMessage--;
+            if (curMessage < 0)
+                curMessage = 0;
+            Update();
+        });
+
+        $('#NextButton').click(function() {
+            curMessage++;
+            if (curMessage >= messages.length)
+                curMessage = messages.length - 1;
+
+            Update();
+        });
+
+        Update();
+    });
+</script>

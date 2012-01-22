@@ -1,0 +1,1 @@
+<?= $this->element('ajax_formations_view_page'); ?>

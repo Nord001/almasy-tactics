@@ -1,0 +1,62 @@
+army_controller.php:    function index () {
+battles_controller.php:    function index () {
+battles_controller.php:    function history () {
+battles_controller.php:    function fight () {
+battles_controller.php:    function matchmake () {
+battles_controller.php:    function fight_result ($battleId) {
+characters_controller.php:    function view ($id = null) {
+characters_controller.php:    function new_character () {
+characters_controller.php:    function roll_new_character () {
+characters_controller.php:    function levelup ($characterId = null, $amount = null) {
+characters_controller.php:    function change_class ($characterId = null, $classId = null) {
+characters_controller.php:    function delete ($id = null) {
+faqs_controller.php:    function index () {
+formations_controller.php:    function index () {
+formations_controller.php:    function rankings () {
+formations_controller.php:    function view ($id = null) {
+formations_controller.php:    function create () {
+formations_controller.php:    function edit ($id = null) {
+formations_controller.php:    function move_character () {
+formations_controller.php:    function delete ($id = null) {
+formations_controller.php:    function set_active ($formationId = null) {
+formations_controller.php:    function strategy ($formationId = null) {
+formations_controller.php:    function create_script ($formationId = null) {
+formations_controller.php:    function edit_script ($formationId = null, $scriptId = null) {
+formations_controller.php:    function delete_script ($formationId = null, $scriptId = null) {
+formations_controller.php:    function edit_ai () {
+help_controller.php:    function index ($page = null) {
+help_controller.php:    function class_list () {
+help_controller.php:    function view_class ($str = null) {
+home_controller.php:    function index () {
+home_controller.php:    function feedback () {
+items_controller.php:    function index () {
+items_controller.php:    function unequip_item () {
+items_controller.php:    function equip_item () {
+items_controller.php:    function perform_refine () {
+items_controller.php:    function perform_imbue () {
+items_controller.php:    function store () {
+items_controller.php:    function view_items () {
+items_controller.php:    function buy_item () {
+items_controller.php:    function sell_item () {
+messages_controller.php:    function index ($page = null) {
+messages_controller.php:    function send ($replyMessageId = null) {
+messages_controller.php:    function mark_read () {
+messages_controller.php:    function clean () {
+messages_controller.php:    function mark_all_read () {
+messages_controller.php:    function delete () {
+status_controller.php:    function index () {
+users_controller.php:    function login () {
+users_controller.php:    function logout () {
+users_controller.php:    function change_password () {
+users_controller.php:    function get_money () {
+users_controller.php:    function register ($referrerUsername = null) {
+users_controller.php:    function usernameAvailable () {
+users_controller.php:    function profile ($id = null) {
+users_controller.php:    function referrals () {
+users_controller.php:    function change_portrait ($name = null) {
+users_controller.php:    function reset () {
+users_controller.php:    function forgot () {
+users_controller.php:    function reset_password ($username = null, $key = null) {
+users_controller.php:    function stats () {
+users_controller.php:    function increase_stat () {
+users_controller.php:    function preferences () {

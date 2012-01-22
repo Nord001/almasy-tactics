@@ -1,0 +1,15 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+   
+    # Add www
+    RewriteCond %{HTTP_HOST} ^almasytactics.com
+    RewriteRule (.*) http://www.almasytactics.com/$1 [R=301,L]
+    
+    # Request to .php files go regularly
+    RewriteCond %{REQUEST_FILENAME} !.*\.php$
+    
+    # We now take all files and dispense them with index.php so we don't need this
+    #RewriteCond %{REQUEST_FILENAME} !-f
+    
+    RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+</IfModule>
